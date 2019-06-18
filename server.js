@@ -11,7 +11,7 @@ var cheerio = require("cheerio");
 // Require all models
 var db = require("./models");
 
-var PORT = 3000;
+const PORT = process.env.PORT ||3000;
 
 // Initialize Express
 var app = express();
@@ -27,26 +27,9 @@ app.use(express.json());
 app.use(express.static("public"));
 var exphbs = require("express-handlebars");
 
-
-
 // Connect to the Mongo DB
 //mongoose.connect("mongodb://localhost/NewsScrape", { useNewUrlParser: true });
-const dbURI = process.env.MONGODB_URI || "mongodb://localhost:27017/foxNews";
-mongoose.set('useCreateIndex',true)
-mongoose.connect(dbURI,{useNewUrlParser: true});
-
-const db1 =mongoose.connection;
-
-db1.on("error", function(error){
-  console.log("Mongoose Error:", error);
-});
-
-db1.once("open", function(){
-  console.log("Mongoose connection successful");
-  app.listen(PORT, function() {
-    console.log("App running on port" + PORT);
-  })
-})
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/foxnews");
 
 app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
@@ -180,4 +163,6 @@ app.post("/save", function(req, res) {
     }
   });
 });
-
+app.listen(PORT, function() {
+  console.log(`🌎  ==> API Server now listening on PORT ${PORT}!`);
+});
