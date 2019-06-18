@@ -28,9 +28,25 @@ app.use(express.static("public"));
 var exphbs = require("express-handlebars");
 
 
+
 // Connect to the Mongo DB
-mongoose.connect("mongodb://localhost/NewsScrape", { useNewUrlParser: true });
-//mongoose.connect(process.env.MONGODB_URI);
+//mongoose.connect("mongodb://localhost/NewsScrape", { useNewUrlParser: true });
+const dbURI = process.env.MONGODB_URI || "mongodb://localhost:27017/foxNews";
+mongoose.set('useCreateIndex',true)
+mongoose.connect(dbURI,{useNewUrlParser: true});
+
+const db1 =mongoose.connection;
+
+db1.on("error", function(error){
+  console.log("Mongoose Error:", error);
+});
+
+db1.once("open", function(){
+  console.log("Mongoose connection successful");
+  app.listen(PORT, function() {
+    console.log("App running on port" + PORT);
+  })
+})
 
 app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
@@ -165,7 +181,3 @@ app.post("/save", function(req, res) {
   });
 });
 
-// Start the server
-app.listen(PORT, function() {
-  console.log("App running on port " + PORT + "!");
-});
